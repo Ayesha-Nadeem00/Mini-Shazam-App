@@ -45,6 +45,50 @@ def songs_count():
     return {"count": count, "max": MAX_SONGS}
 
 
+@app.get("/songs")
+def list_songs():
+    """Saare songs ki list return karta hai (Library page ke liye)."""
+    from db_config import get_connection
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id, title, artist, album FROM songs ORDER BY id DESC;")
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    songs = [
+        {"id": r[0], "title": r[1], "artist": r[2], "album": r[3]}
+        for r in rows
+    ]
+    return {"songs": songs}
+
+
+@app.delete("/songs/{song_id}")
+def delete_song(song_id: int):
+    """
+    Ek song ko database se delete karta hai.
+    Uske fingerprints bhi apne aap delete ho jayenge
+    (schema mein ON DELETE CASCADE laga hua hai).
+    """
+    from db_config import get_connection
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT title FROM songs WHERE id = %s;", (song_id,))
+    row = cur.fetchone()
+
+    if not row:
+        cur.close()
+        conn.close()
+        return {"status": "error", "message": "Song nahi mila."}
+
+    cur.execute("DELETE FROM songs WHERE id = %s;", (song_id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return {"status": "success", "message": f"'{row[0]}' delete ho gaya."}
+
+
 @app.post("/songs/add")
 def api_add_song(
     title: str = Form(...),
@@ -70,6 +114,44 @@ def api_add_song(
         return {"status": "error", "message": str(e)}
     finally:
         os.remove(temp_path)  # temporary file delete kar dein, jagah bachane ke liye
+
+
+@app.get("/songs")
+def list_songs():
+    """Saare songs ki list deta hai (Library page ke liye)."""
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id, title, artist, album FROM songs ORDER BY id DESC;")
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    songs = [
+        {"id": r[0], "title": r[1], "artist": r[2], "album": r[3]}
+        for r in rows
+    ]
+    return {"songs": songs}
+
+
+@app.delete("/songs/{song_id}")
+def delete_song(song_id: int):
+    """
+    Ek song ko database se delete karta hai.
+    Uske saare fingerprints bhi apne aap delete ho jate hain
+    (kyunke schema mein ON DELETE CASCADE lagaya tha).
+    """
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM songs WHERE id = %s RETURNING id;", (song_id,))
+    deleted = cur.fetchone()
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    if deleted:
+        return {"status": "success", "message": f"Song {song_id} delete ho gaya."}
+    else:
+        return {"status": "error", "message": "Ye song nahi mila."}
 
 
 @app.post("/recognize")

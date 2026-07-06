@@ -1,124 +1,772 @@
 <!DOCTYPE html>
-<html lang="ur">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Shazam Clone</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shazam mini - Light Teal Theme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #121212;
-        color: white;
-        text-align: center;
-        padding: 50px;
+    :root {
+        --bg-deep: #b2dfdb;       /* Premium soft light teal */
+        --bg-mid: #f0faf9;        /* Crisp, fresh light teal backdrop */
+        --accent: #0f766e;        /* Luxurious deep dark teal */
+        --accent-glow: #0d9488;   /* Vibrant dark teal glow */
+        --accent-soft: rgba(15, 118, 110, 0.15);
+        --text-primary: #0f2d2a;  /* Near-black dark teal for extreme readability */
+        --text-secondary: #3f6b66;/* Muted dark teal for supporting copy */
+        --danger: #e11d48;        /* High-contrast warning rose/red */
+        --success: #0f766e;       /* Success dark teal */
+        --card: #115e59;          /* Rich dark teal for cards */
+        --card-text: #f2fbf9;     /* Ultra-light mint/white text inside dark cards */
+        --border: #99d6cf;        /* Crisp light-teal borders */
     }
-    h1 { color: #1db954; }
-    button {
-        padding: 15px 30px;
-        font-size: 18px;
-        border-radius: 50px;
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: radial-gradient(circle at 50% 0%, var(--bg-mid) 0%, var(--bg-deep) 100%);
+        color: var(--text-primary);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+    }
+
+    .app {
+        width: 100%;
+        max-width: 480px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        background: rgba(240, 250, 249, 0.8);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 0 40px rgba(15, 118, 110, 0.15);
+    }
+
+    header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 24px 20px 12px;
+    }
+
+    header .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    header h1 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: var(--accent);
+    }
+
+    main {
+        flex: 1;
+        padding: 0 24px 100px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ---------- SEARCH VIEW ---------- */
+    .search-view {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 8px;
+    }
+
+    .search-view h2 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 26px;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .search-view p {
+        color: var(--text-secondary);
+        font-size: 14px;
+        margin-bottom: 36px;
+    }
+
+    .mic-wrap {
+        position: relative;
+        width: 160px;
+        height: 160px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 40px;
+    }
+
+    .mic-ring {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 2px solid var(--accent-soft);
+        animation: none;
+    }
+
+    .mic-ring.pulsing {
+        animation: pulse 1.6s ease-out infinite;
+    }
+    .mic-ring:nth-child(2).pulsing { animation-delay: 0.4s; }
+    .mic-ring:nth-child(3).pulsing { animation-delay: 0.8s; }
+
+    @keyframes pulse {
+        0%   { transform: scale(0.75); opacity: 0.8; }
+        100% { transform: scale(1.35); opacity: 0; }
+    }
+
+    #recordBtn {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
         border: none;
         cursor: pointer;
-        margin: 10px;
+        background: linear-gradient(145deg, var(--accent-glow), var(--accent) 70%);
+        box-shadow: 0 10px 30px rgba(15, 118, 110, 0.3), inset 0 0 20px rgba(255,255,255,0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        z-index: 1;
     }
-    #recordBtn { background: #1db954; color: white; }
-    #recordBtn.recording { background: #e74c3c; }
-    #result {
-        margin-top: 30px;
-        font-size: 20px;
-        min-height: 60px;
+
+    #recordBtn:active { transform: scale(0.94); }
+
+    #recordBtn.recording {
+        background: linear-gradient(145deg, #f43f5e, var(--danger) 70%);
+        box-shadow: 0 10px 30px rgba(225, 29, 72, 0.4), inset 0 0 20px rgba(255,255,255,0.2);
     }
-    #status { color: #999; }
+
+    #recordBtn svg { width: 44px; height: 44px; }
+
+    .status-text {
+        font-size: 14px;
+        color: var(--text-secondary);
+        font-weight: 500;
+        min-height: 20px;
+    }
+
+    .status-text.success { color: var(--success); }
+    .status-text.error { color: var(--danger); }
+
+    .result-card {
+        margin-top: 28px;
+        width: 100%;
+        background: var(--card); /* Dark teal background */
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 18px;
+        padding: 18px;
+        display: none;
+        align-items: center;
+        gap: 14px;
+        text-align: left;
+        box-shadow: 0 10px 25px rgba(15, 118, 110, 0.2);
+    }
+
+    .result-card.show { display: flex; }
+
+    .result-art {
+        width: 54px;
+        height: 54px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #2dd4bf, var(--accent-glow));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 22px;
+    }
+
+    .result-info h3 { font-size: 16px; font-weight: 600; color: var(--card-text); }
+    .result-info p { font-size: 13px; color: #ccede8; margin-top: 2px; }
+    .result-info .score { font-size: 11px; color: #2dd4bf; margin-top: 4px; font-weight: 500; }
+
+    /* ---------- LIBRARY VIEW ---------- */
+    .library-view { display: none; padding-top: 24px; }
+    .library-view.show { display: block; }
+
+    .library-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .library-header h2 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 22px;
+        color: var(--text-primary);
+    }
+
+    .count-pill {
+        font-size: 12px;
+        color: var(--card-text);
+        background: var(--card);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+
+    #addSongBtn {
+        margin: 16px 0 20px;
+        width: 100%;
+        padding: 13px;
+        border-radius: 12px;
+        border: 2px dashed var(--accent);
+        background: rgba(15, 118, 110, 0.05);
+        color: var(--accent);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    #addSongBtn:hover {
+        background: var(--accent-soft);
+        border-color: var(--accent-glow);
+    }
+
+    .song-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 12px;
+        background: rgba(255, 255, 255, 0.4);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        margin-bottom: 10px;
+        transition: transform 0.2s;
+    }
+
+    .song-row:hover {
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.7);
+    }
+
+    .song-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        flex-shrink: 0;
+    }
+
+    .song-details { flex: 1; min-width: 0; }
+    .song-details .t { font-size: 14px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .song-details .a { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
+
+    .delete-btn {
+        background: transparent;
+        border: 1px solid rgba(225, 29, 72, 0.3);
+        color: var(--danger);
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        padding: 6px 12px;
+        border-radius: 8px;
+        transition: background 0.2s, border-color 0.2s;
+    }
+    .delete-btn:hover {
+        background: rgba(225, 29, 72, 0.1);
+        border-color: var(--danger);
+    }
+
+    .empty-msg {
+        text-align: center;
+        color: var(--text-secondary);
+        font-size: 14px;
+        padding: 40px 0;
+    }
+
+    /* ---------- BOTTOM NAV ---------- */
+    nav {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 480px;
+        display: flex;
+        background: var(--card); /* Rich Dark Teal bottom bar */
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 10px 0 18px;
+        z-index: 5;
+    }
+
+    .nav-btn {
+        flex: 1;
+        background: none;
+        border: none;
+        color: #a3cbd6; /* Muted teal for inactive navigation */
+        font-size: 11px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+
+    .nav-btn.active { color: #ffffff; }
+    .nav-btn svg { width: 20px; height: 20px; }
+
+    /* ---------- CUSTOM MODALS ---------- */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 45, 42, 0.45);
+        backdrop-filter: blur(6px);
+        display: none;
+        align-items: flex-end;
+        justify-content: center;
+        z-index: 10;
+    }
+    .modal-overlay.show { display: flex; }
+
+    .modal {
+        width: 100%;
+        max-width: 480px;
+        background: var(--card); /* Rich Dark Teal Modal base */
+        color: var(--card-text);
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+        border-left: 1px solid rgba(255, 255, 255, 0.15);
+        border-right: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 24px 24px 0 0;
+        padding: 24px 24px 36px;
+        box-shadow: 0 -10px 30px rgba(15, 118, 110, 0.3);
+    }
+
+    .modal h3 {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 18px;
+        margin-bottom: 16px;
+        color: #ffffff;
+    }
+
+    .field { margin-bottom: 14px; }
+    .field label {
+        display: block;
+        font-size: 12px;
+        color: #ccede8;
+        margin-bottom: 6px;
+        font-weight: 500;
+    }
+    .field input[type="text"] {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(15, 45, 42, 0.3);
+        color: #ffffff;
+        font-size: 14px;
+        outline: none;
+    }
+    .field input[type="text"]::placeholder {
+        color: #8bbcb6;
+    }
+    .field input[type="file"] {
+        width: 100%;
+        font-size: 13px;
+        color: #ccede8;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .btn-primary, .btn-secondary {
+        flex: 1;
+        padding: 13px;
+        border-radius: 12px;
+        border: none;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.2s, background-color 0.2s;
+    }
+    .btn-primary { background: #2dd4bf; color: var(--text-primary); }
+    .btn-primary:hover { opacity: 0.95; }
+    .btn-secondary { background: rgba(255,255,255,0.08); color: #ccede8; border: 1px solid rgba(255,255,255,0.15); }
+    .btn-secondary:hover { color: #ffffff; background: rgba(255,255,255,0.15); }
+
+    .modal-status {
+        margin-top: 10px;
+        font-size: 13px;
+        text-align: center;
+        min-height: 18px;
+    }
+
+    .text-center {
+        text-align: center;
+    }
 </style>
 </head>
 <body>
 
-    <h1>🎵 Shazam Clone</h1>
-    <p>Press Button to start Recording</p>
+<div class="app">
 
-    <button id="recordBtn">🎤 Start Recording</button>
+    <header>
+        <div class="dot"></div>
+        <h1>SHAZAM</h1>
+    </header>
 
-    <div id="status">Ready...</div>
-    <div id="result"></div>
+    <main>
 
-    <script>
-        // ⚠️ Agar backend kisi doosre address/port pe chal raha ho to yahan badlein
-        const API_URL = "http://127.0.0.1:8000";
+        <!-- ============ SEARCH VIEW ============ -->
+        <section class="search-view" id="searchView">
+            <h2 id="searchTitle">Tap to identify</h2>
+            <p id="searchSubtitle">Play a song nearby and we'll find it</p>
 
-        const recordBtn = document.getElementById("recordBtn");
-        const statusDiv = document.getElementById("status");
-        const resultDiv = document.getElementById("result");
+            <div class="mic-wrap">
+                <div class="mic-ring" id="ring1"></div>
+                <div class="mic-ring" id="ring2"></div>
+                <div class="mic-ring" id="ring3"></div>
+                <button id="recordBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8">
+                        <path d="M12 15a3 3 0 003-3V6a3 3 0 10-6 0v6a3 3 0 003 3z" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M19 11a7 7 0 01-14 0M12 18v3" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
 
-        let mediaRecorder;
-        let audioChunks = [];
-        let isRecording = false;
+            <div class="status-text" id="statusText">Ready</div>
 
-        recordBtn.addEventListener("click", async () => {
-            if (!isRecording) {
-                // ===== Recording SHURU karein =====
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream);
-                    audioChunks = [];
+            <div class="result-card" id="resultCard">
+                <div class="result-art">🎵</div>
+                <div class="result-info">
+                    <h3 id="resultTitle"></h3>
+                    <p id="resultArtist"></p>
+                    <p class="score" id="resultScore"></p>
+                </div>
+            </div>
+        </section>
 
-                    mediaRecorder.ondataavailable = (event) => {
-                        audioChunks.push(event.data);
-                    };
+        <!-- ============ LIBRARY VIEW ============ -->
+        <section class="library-view" id="libraryView">
+            <div class="library-header">
+                <h2>Library</h2>
+                <div class="count-pill" id="countPill">0 / 500</div>
+            </div>
 
-                    mediaRecorder.onstop = async () => {
-                        // Recording khatam hote hi, audio ko backend ko bhejein
-                        const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
-                        await sendToBackend(audioBlob);
-                    };
+            <button id="addSongBtn">+ Add a song</button>
 
-                    mediaRecorder.start();
-                    isRecording = true;
-                    recordBtn.textContent = "⏹️ Stop Recording";
-                    recordBtn.classList.add("recording");
-                    statusDiv.textContent = "🔴 Recording started...";
-                    resultDiv.textContent = "";
+            <div id="songList"></div>
+        </section>
 
-                } catch (err) {
-                    statusDiv.textContent = "❌ Mic Permission not found: " + err.message;
-                }
+    </main>
 
-            } else {
-                // ===== Recording ROKEIN =====
-                mediaRecorder.stop();
-                isRecording = false;
-                recordBtn.textContent = "🎤 Start Recording";
-                recordBtn.classList.remove("recording");
-                statusDiv.textContent = "⏳ Song is Recognizing...";
-            }
+    <nav>
+        <button class="nav-btn active" data-view="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15a3 3 0 003-3V6a3 3 0 10-6 0v6a3 3 0 003 3zM19 11a7 7 0 01-14 0M12 18v3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Search
+        </button>
+        <button class="nav-btn" data-view="library">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h7" stroke-linecap="round"/></svg>
+            Library
+        </button>
+    </nav>
+
+    <!-- ============ ADD SONG MODAL ============ -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <h3>Add a new song</h3>
+            <div class="field">
+                <label>Title</label>
+                <input type="text" id="inputTitle" placeholder="Song title">
+            </div>
+            <div class="field">
+                <label>Artist</label>
+                <input type="text" id="inputArtist" placeholder="Artist name">
+            </div>
+            <div class="field">
+                <label>Album (optional)</label>
+                <input type="text" id="inputAlbum" placeholder="Album name">
+            </div>
+            <div class="field">
+                <label>Audio file</label>
+                <input type="file" id="inputFile" accept="audio/*">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="cancelAdd">Cancel</button>
+                <button class="btn-primary" id="confirmAdd">Add song</button>
+            </div>
+            <div class="modal-status" id="modalStatus"></div>
+        </div>
+    </div>
+
+    <!-- ============ CUSTOM CONFIRMATION DIALOG ============ -->
+    <div class="modal-overlay" id="confirmOverlay">
+        <div class="modal text-center">
+            <h3 style="margin-bottom: 12px; color: #ffffff;">Delete Song?</h3>
+            <p style="color: #ccede8; font-size: 14px; margin-bottom: 24px;">Are you sure you want to delete this song from your library?</p>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="confirmCancel">Cancel</button>
+                <button class="btn-primary" id="confirmDelete" style="background: var(--danger); color: white;">Delete</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const API_URL = "http://127.0.0.1:8000"; // change if backend runs elsewhere
+
+    // ---------- View switching ----------
+    const navBtns = document.querySelectorAll(".nav-btn");
+    const searchView = document.getElementById("searchView");
+    const libraryView = document.getElementById("libraryView");
+
+    navBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            navBtns.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            const view = btn.dataset.view;
+            searchView.classList.toggle("show", view === "search");
+            libraryView.classList.toggle("show", view === "library");
+            searchView.style.display = view === "search" ? "flex" : "none";
+            libraryView.style.display = view === "library" ? "block" : "none";
+            if (view === "library") loadSongs();
         });
+    });
 
-        async function sendToBackend(audioBlob) {
-            const formData = new FormData();
-            formData.append("file", audioBlob, "clip.webm");
+    // ---------- Recording ----------
+    const recordBtn = document.getElementById("recordBtn");
+    const statusText = document.getElementById("statusText");
+    const searchTitle = document.getElementById("searchTitle");
+    const searchSubtitle = document.getElementById("searchSubtitle");
+    const resultCard = document.getElementById("resultCard");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultArtist = document.getElementById("resultArtist");
+    const resultScore = document.getElementById("resultScore");
+    const rings = [document.getElementById("ring1"), document.getElementById("ring2"), document.getElementById("ring3")];
 
+    let mediaRecorder, audioChunks = [], isRecording = false, autoStopTimer = null;
+    const RECORD_SECONDS = 10; // recording time duration
+
+    function stopRecording() {
+        if (!isRecording) return;
+        clearTimeout(autoStopTimer);
+        mediaRecorder.stop();
+        isRecording = false;
+        recordBtn.classList.remove("recording");
+        rings.forEach(r => r.classList.remove("pulsing"));
+        searchTitle.textContent = "Identifying...";
+        searchSubtitle.textContent = "Hold on a second";
+        statusText.textContent = "Processing";
+    }
+
+    recordBtn.addEventListener("click", async () => {
+        if (isRecording) {
+            stopRecording();
+            return;
+        }
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            mediaRecorder.onstop = async () => {
+                const blob = new Blob(audioChunks, { type: "audio/webm" });
+                await recognize(blob);
+            };
+            mediaRecorder.start();
+            isRecording = true;
+            recordBtn.classList.add("recording");
+            rings.forEach(r => r.classList.add("pulsing"));
+            searchTitle.textContent = "Listening...";
+            searchSubtitle.textContent = `Recording `;
+            statusText.textContent = "Recording";
+            statusText.className = "status-text";
+            resultCard.classList.remove("show");
+
+            autoStopTimer = setTimeout(stopRecording, RECORD_SECONDS * 1000);
+
+        } catch (err) {
+            statusText.textContent = "Microphone access denied";
+            statusText.className = "status-text error";
+        }
+    });
+
+    async function recognize(blob) {
+        const formData = new FormData();
+        formData.append("file", blob, "clip.webm");
+        try {
+            const res = await fetch(`${API_URL}/recognize`, { method: "POST", body: formData });
+            const data = await res.json();
+
+            if (data.status === "found") {
+                searchTitle.textContent = "Match found";
+                searchSubtitle.textContent = "Here's what's playing";
+                statusText.textContent = "Success";
+                statusText.className = "status-text success";
+                resultTitle.textContent = data.song.title;
+                resultArtist.textContent = data.song.artist;
+                resultCard.classList.add("show");
+            } else {
+                searchTitle.textContent = "No match found";
+                searchSubtitle.textContent = "Try again closer to the audio source";
+                statusText.textContent = "Not found";
+                statusText.className = "status-text error";
+                resultCard.classList.remove("show");
+            }
+        } catch (err) {
+            searchTitle.textContent = "Connection error";
+            searchSubtitle.textContent = "Is the backend server running?";
+            statusText.textContent = err.message;
+            statusText.className = "status-text error";
+        }
+    }
+
+    // ---------- Library ----------
+    const songList = document.getElementById("songList");
+    const countPill = document.getElementById("countPill");
+
+    async function loadSongs() {
+        songList.innerHTML = `<div class="empty-msg">Loading...</div>`;
+        try {
+            const [songsRes, countRes] = await Promise.all([
+                fetch(`${API_URL}/songs`).then(r => r.json()),
+                fetch(`${API_URL}/songs/count`).then(r => r.json())
+            ]);
+            countPill.textContent = `${countRes.count} / ${countRes.max}`;
+
+            if (songsRes.songs.length === 0) {
+                songList.innerHTML = `<div class="empty-msg">No songs yet. Add your first one.</div>`;
+                return;
+            }
+
+            songList.innerHTML = songsRes.songs.map(s => `
+                <div class="song-row" data-id="${s.id}">
+                    <div class="song-icon">🎵</div>
+                    <div class="song-details">
+                        <div class="t">${escapeHtml(s.title)}</div>
+                        <div class="a">${escapeHtml(s.artist)}</div>
+                    </div>
+                    <button class="delete-btn" data-id="${s.id}">Delete</button>
+                </div>
+            `).join("");
+
+            document.querySelectorAll(".delete-btn").forEach(btn => {
+                btn.addEventListener("click", () => queueDeleteSong(btn.dataset.id));
+            });
+        } catch (err) {
+            songList.innerHTML = `<div class="empty-msg">Could not reach server.</div>`;
+        }
+    }
+
+    function escapeHtml(str) {
+        const div = document.createElement("div");
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    // ---------- Safe Custom Confirmation logic (No window.confirm) ----------
+    let songIdToDelete = null;
+    const confirmOverlay = document.getElementById("confirmOverlay");
+    const confirmCancel = document.getElementById("confirmCancel");
+    const confirmDelete = document.getElementById("confirmDelete");
+
+    function queueDeleteSong(id) {
+        songIdToDelete = id;
+        confirmOverlay.classList.add("show");
+    }
+
+    confirmCancel.addEventListener("click", () => {
+        songIdToDelete = null;
+        confirmOverlay.classList.remove("show");
+    });
+
+    confirmDelete.addEventListener("click", async () => {
+        if (songIdToDelete) {
             try {
-                const response = await fetch(`${API_URL}/recognize`, {
-                    method: "POST",
-                    body: formData
-                });
-                const data = await response.json();
-
-                if (data.status === "found") {
-                    statusDiv.textContent = "✅ Match Found!";
-                    resultDiv.innerHTML = `
-                        <strong>${data.song.title}</strong><br>
-                        ${data.song.artist}<br>
-                        
-                    `;
-                } else {
-                    statusDiv.textContent = "❌ No Match Found";
-                    resultDiv.textContent = "This song is not in Database.";
-                }
+                await fetch(`${API_URL}/songs/${songIdToDelete}`, { method: "DELETE" });
+                loadSongs();
             } catch (err) {
-                statusDiv.textContent = "❌ Server not connected.";
-                resultDiv.textContent = err.message;
+                console.error("Delete failed", err);
             }
         }
-    </script>
+        songIdToDelete = null;
+        confirmOverlay.classList.remove("show");
+    });
+
+    const modalOverlay = document.getElementById("modalOverlay");
+    const addSongBtn = document.getElementById("addSongBtn");
+    const cancelAdd = document.getElementById("cancelAdd");
+    const confirmAdd = document.getElementById("confirmAdd");
+    const modalStatus = document.getElementById("modalStatus");
+
+    addSongBtn.addEventListener("click", () => modalOverlay.classList.add("show"));
+    cancelAdd.addEventListener("click", () => modalOverlay.classList.remove("show"));
+
+    confirmAdd.addEventListener("click", async () => {
+        const title = document.getElementById("inputTitle").value.trim();
+        const artist = document.getElementById("inputArtist").value.trim();
+        const album = document.getElementById("inputAlbum").value.trim();
+        const file = document.getElementById("inputFile").files[0];
+
+        if (!title || !artist || !file) {
+            modalStatus.textContent = "Please fill title, artist and choose a file.";
+            modalStatus.style.color = "var(--danger)";
+            return;
+        }
+
+        modalStatus.textContent = "Uploading and fingerprinting... this can take a moment.";
+        modalStatus.style.color = "#ccede8";
+
+        const formData = new FormData();
+        formData.append("title", title);
+        formData.append("artist", artist);
+        formData.append("album", album);
+        formData.append("file", file);
+
+        try {
+            const res = await fetch(`${API_URL}/songs/add`, { method: "POST", body: formData });
+            const data = await res.json();
+
+            if (data.status === "success") {
+                modalStatus.textContent = "Song added!";
+                modalStatus.style.color = "#2dd4bf";
+                setTimeout(() => {
+                    modalOverlay.classList.remove("show");
+                    modalStatus.textContent = "";
+                    document.getElementById("inputTitle").value = "";
+                    document.getElementById("inputArtist").value = "";
+                    document.getElementById("inputAlbum").value = "";
+                    document.getElementById("inputFile").value = "";
+                    loadSongs();
+                }, 900);
+            } else {
+                modalStatus.textContent = data.message || "Something went wrong.";
+                modalStatus.style.color = "var(--danger)";
+            }
+        } catch (err) {
+            modalStatus.textContent = "Could not reach server.";
+            modalStatus.style.color = "var(--danger)";
+        }
+    });
+</script>
 
 </body>
 </html>
