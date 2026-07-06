@@ -1,462 +1,124 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ur">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shazam Clone — Frontend</title>
+<title>Shazam Clone</title>
 <style>
-  :root{
-    --bg-deep:#02040f;
-    --bg-mid:#050b2e;
-    --blue-glow:#0a5cff;
-    --blue-bright:#2e8bff;
-    --cyan:#5ad1ff;
-    --white:#f5f8ff;
-    --muted:#8590b8;
-    --card:#0b1440;
-    --card-border:rgba(90,150,255,0.18);
-  }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  html,body{height:100%;}
-  body{
-    font-family:'Segoe UI', system-ui, -apple-system, Arial, sans-serif;
-    background:radial-gradient(ellipse at 50% -10%, #0a1a5c 0%, var(--bg-mid) 45%, var(--bg-deep) 100%);
-    color:var(--white);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
-    overflow:hidden;
-  }
-
-  /* phone frame */
-  .phone{
-    position:relative;
-    width:390px;
-    height:844px;
-    max-width:100vw;
-    max-height:100vh;
-    background:linear-gradient(180deg, #030821 0%, #050c30 55%, #020616 100%);
-    border-radius:44px;
-    border:2px solid rgba(255,255,255,0.06);
-    box-shadow:0 40px 100px rgba(0,10,60,0.7), inset 0 0 60px rgba(10,60,180,0.08);
-    overflow:hidden;
-    display:flex;
-    flex-direction:column;
-  }
-
-  /* ambient background rings */
-  .ambient{
-    position:absolute; inset:0; pointer-events:none; z-index:0;
-    background:
-      radial-gradient(circle at 50% 38%, rgba(46,139,255,0.16) 0%, transparent 45%);
-  }
-  .ambient::before, .ambient::after{
-    content:"";
-    position:absolute;
-    left:50%; top:40%;
-    width:520px; height:520px;
-    margin-left:-260px; margin-top:-260px;
-    border-radius:50%;
-    border:1px solid rgba(90,150,255,0.06);
-    animation:drift 12s ease-in-out infinite;
-  }
-  .ambient::after{ width:680px; height:680px; margin-left:-340px; margin-top:-340px; animation-delay:2s; }
-  @keyframes drift{ 0%,100%{transform:scale(1); opacity:.5;} 50%{transform:scale(1.05); opacity:.9;} }
-
-  /* top bar */
-  .topbar{
-    z-index:2;
-    display:flex; align-items:center; justify-content:space-between;
-    padding:22px 22px 6px;
-  }
-  .icon-btn{
-    width:34px; height:34px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    background:rgba(255,255,255,0.06);
-    border:1px solid rgba(255,255,255,0.08);
-  }
-  .icon-btn svg{width:16px; height:16px; stroke:var(--white); fill:none; stroke-width:2;}
-  .brand{
-    display:flex; align-items:center; gap:8px;
-    letter-spacing:2px; font-size:14px; font-weight:700; color:var(--muted);
-    text-transform:uppercase;
-  }
-  .brand .dot{width:6px; height:6px; border-radius:50%; background:var(--blue-bright); box-shadow:0 0 8px var(--blue-bright);}
-
-  /* main stage */
-  .stage{
-    z-index:2;
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:26px;
-    padding:0 30px;
-    position:relative;
-  }
-  .headline{
-    text-align:center;
-  }
-  .headline h1{
-    font-size:26px;
-    font-weight:600;
-    letter-spacing:0.3px;
-  }
-  .headline p{
-    margin-top:6px;
-    font-size:13.5px;
-    color:var(--muted);
-  }
-
-  /* the tap-to-shazam button */
-  .tap-zone{
-    position:relative;
-    width:220px; height:220px;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .ring{
-    position:absolute;
-    border-radius:50%;
-    border:2px solid var(--blue-bright);
-    opacity:0;
-  }
-  .listening .ring{
-    animation:pulse-ring 2.2s cubic-bezier(0.2,0.6,0.4,1) infinite;
-  }
-  .ring:nth-child(1){animation-delay:0s;}
-  .ring:nth-child(2){animation-delay:0.5s;}
-  .ring:nth-child(3){animation-delay:1s;}
-  @keyframes pulse-ring{
-    0%{ width:150px; height:150px; opacity:0.55; }
-    100%{ width:280px; height:280px; opacity:0; }
-  }
-
-  .shazam-btn{
-    position:relative;
-    width:150px; height:150px;
-    border-radius:50%;
-    border:none;
-    cursor:pointer;
-    background:radial-gradient(circle at 32% 28%, #3d9bff 0%, #0a5cff 55%, #063fb0 100%);
-    box-shadow:
-      0 0 0 6px rgba(46,139,255,0.08),
-      0 10px 40px rgba(10,60,220,0.55),
-      inset 0 2px 10px rgba(255,255,255,0.25);
-    display:flex; align-items:center; justify-content:center;
-    transition:transform .15s ease;
-    z-index:2;
-  }
-  .shazam-btn:active{ transform:scale(0.96); }
-  .shazam-btn svg{ width:46px; height:46px; }
-
-  .bars{
-    display:flex; align-items:center; gap:5px; height:36px;
-  }
-  .bars span{
-    display:block; width:5px; border-radius:3px;
-    background:var(--white);
-    animation:none;
-  }
-  .listening .bars span{ animation:eq 1.1s ease-in-out infinite; }
-  .bars span:nth-child(1){height:14px; animation-delay:0s;}
-  .bars span:nth-child(2){height:28px; animation-delay:.15s;}
-  .bars span:nth-child(3){height:36px; animation-delay:.3s;}
-  .bars span:nth-child(4){height:22px; animation-delay:.45s;}
-  .bars span:nth-child(5){height:12px; animation-delay:.6s;}
-  @keyframes eq{
-    0%,100%{ transform:scaleY(0.4); }
-    50%{ transform:scaleY(1); }
-  }
-
-  .status-text{
-    font-size:13px; color:var(--muted); letter-spacing:0.5px; height:16px;
-  }
-
-  /* result card */
-  .result-card{
-    position:absolute;
-    left:16px; right:16px; bottom:110px;
-    background:linear-gradient(160deg, var(--card) 0%, #081030 100%);
-    border:1px solid var(--card-border);
-    border-radius:22px;
-    padding:18px;
-    display:flex;
-    gap:14px;
-    align-items:center;
-    box-shadow:0 20px 60px rgba(0,0,0,0.5);
-    transform:translateY(140%);
-    transition:transform .5s cubic-bezier(.2,.8,.2,1);
-    z-index:5;
-  }
-  .result-card.show{ transform:translateY(0); }
-  .art{
-    width:64px; height:64px; border-radius:12px; flex-shrink:0;
-    background:linear-gradient(135deg, #2e8bff, #6a3dff);
-    display:flex; align-items:center; justify-content:center;
-    font-size:22px;
-  }
-  .meta{ flex:1; min-width:0; }
-  .meta .title{ font-size:15.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .meta .artist{ font-size:13px; color:var(--muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .play-fab{
-    width:38px; height:38px; border-radius:50%; border:none;
-    background:var(--blue-bright);
-    display:flex; align-items:center; justify-content:center; cursor:pointer;
-    flex-shrink:0;
-  }
-  .play-fab svg{ width:16px; height:16px; fill:white; }
-
-  /* bottom nav */
-  .navbar{
-    z-index:2;
-    display:flex;
-    justify-content:space-around;
-    align-items:center;
-    padding:14px 10px calc(18px + env(safe-area-inset-bottom));
-    border-top:1px solid rgba(255,255,255,0.06);
-    background:rgba(3,7,25,0.6);
-    backdrop-filter:blur(10px);
-  }
-  .nav-item{
-    display:flex; flex-direction:column; align-items:center; gap:4px;
-    color:var(--muted); font-size:10.5px; letter-spacing:.3px;
-    cursor:pointer;
-  }
-  .nav-item svg{ width:22px; height:22px; stroke:var(--muted); fill:none; stroke-width:1.8; }
-  .nav-item.active{ color:var(--white); }
-  .nav-item.active svg{ stroke:var(--blue-bright); }
-
-  @media (max-width:420px){
-    .phone{ border-radius:0; width:100vw; height:100vh; border:none; }
-  }
+    body {
+        font-family: Arial, sans-serif;
+        background: #121212;
+        color: white;
+        text-align: center;
+        padding: 50px;
+    }
+    h1 { color: #1db954; }
+    button {
+        padding: 15px 30px;
+        font-size: 18px;
+        border-radius: 50px;
+        border: none;
+        cursor: pointer;
+        margin: 10px;
+    }
+    #recordBtn { background: #1db954; color: white; }
+    #recordBtn.recording { background: #e74c3c; }
+    #result {
+        margin-top: 30px;
+        font-size: 20px;
+        min-height: 60px;
+    }
+    #status { color: #999; }
 </style>
 </head>
 <body>
 
-<div class="phone" id="phone">
-  <div class="ambient"></div>
+    <h1>🎵 Shazam Clone</h1>
+    <p>Press Button to start Recording</p>
 
-  <div class="topbar">
-    <div class="icon-btn"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round"/></svg></div>
-    <div class="brand"><span class="dot"></span>shazam</div>
-    <div class="icon-btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-4 3-6 7-6s7 2 7 6"/></svg></div>
-  </div>
+    <button id="recordBtn">🎤 Start Recording</button>
 
-  <div style="z-index:2; padding:0 22px; margin-top:4px;">
-    <input id="backendUrl" type="text" value="http://127.0.0.1:8000"
-      style="width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
-             border-radius:10px; padding:7px 10px; color:#8590b8; font-size:11px; outline:none;"
-      title="Backend server URL">
-  </div>
+    <div id="status">Ready...</div>
+    <div id="result"></div>
 
-  <div class="stage" id="stage">
-    <div class="headline" id="headline">
-      <h1>Tap to Shazam</h1>
-      <p>Identify any song playing around you</p>
-    </div>
+    <script>
+        // ⚠️ Agar backend kisi doosre address/port pe chal raha ho to yahan badlein
+        const API_URL = "http://127.0.0.1:8000";
 
-    <div class="tap-zone" id="tapZone">
-      <div class="ring"></div>
-      <div class="ring"></div>
-      <div class="ring"></div>
-      <button class="shazam-btn" id="shazamBtn" aria-label="Tap to Shazam">
-        <svg id="btnIcon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 1a4 4 0 0 0-4 4v6a4 4 0 0 0 8 0V5a4 4 0 0 0-4-4z"/>
-          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-          <line x1="12" y1="19" x2="12" y2="23"/>
-        </svg>
-        <div class="bars" id="bars" style="display:none">
-          <span></span><span></span><span></span><span></span><span></span>
-        </div>
-      </button>
-    </div>
+        const recordBtn = document.getElementById("recordBtn");
+        const statusDiv = document.getElementById("status");
+        const resultDiv = document.getElementById("result");
 
-    <div class="status-text" id="statusText">&nbsp;</div>
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
 
-    <div class="result-card" id="resultCard">
-      <div class="art">🎵</div>
-      <div class="meta">
-        <div class="title" id="resTitle">Song Title</div>
-        <div class="artist" id="resArtist">Artist Name</div>
-      </div>
-      <button class="play-fab" aria-label="Play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
-    </div>
-  </div>
+        recordBtn.addEventListener("click", async () => {
+            if (!isRecording) {
+                // ===== Recording SHURU karein =====
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
 
-  <div class="navbar">
-    <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search</div>
-    <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M3 12l2-8h14l2 8"/><path d="M5 12v7a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1v-7"/></svg>Charts</div>
-    <div class="nav-item active"><svg viewBox="0 0 24 24"><path d="M12 1a4 4 0 0 0-4 4v6a4 4 0 0 0 8 0V5a4 4 0 0 0-4-4z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>My Shazam</div>
-    <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Library</div>
-    <div class="nav-item"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-4 3-6 7-6s7 2 7 6"/></svg>Profile</div>
-  </div>
-</div>
+                    mediaRecorder.ondataavailable = (event) => {
+                        audioChunks.push(event.data);
+                    };
 
-<script>
-  const tapZone    = document.getElementById('tapZone');
-  const btnIcon    = document.getElementById('btnIcon');
-  const bars       = document.getElementById('bars');
-  const statusText = document.getElementById('statusText');
-  const headline   = document.getElementById('headline');
-  const resultCard = document.getElementById('resultCard');
-  const resTitle   = document.getElementById('resTitle');
-  const resArtist  = document.getElementById('resArtist');
-  const urlInput   = document.getElementById('backendUrl');
+                    mediaRecorder.onstop = async () => {
+                        // Recording khatam hote hi, audio ko backend ko bhejein
+                        const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+                        await sendToBackend(audioBlob);
+                    };
 
-  const RECORD_SECONDS = 6;
-  let listening = false;
+                    mediaRecorder.start();
+                    isRecording = true;
+                    recordBtn.textContent = "⏹️ Stop Recording";
+                    recordBtn.classList.add("recording");
+                    statusDiv.textContent = "🔴 Recording started...";
+                    resultDiv.textContent = "";
 
-  function setHeadline(title, sub){
-    headline.querySelector('h1').textContent = title;
-    headline.querySelector('p').textContent = sub;
-  }
+                } catch (err) {
+                    statusDiv.textContent = "❌ Mic Permission not found: " + err.message;
+                }
 
-  function enterListeningUI(){
-    tapZone.classList.add('listening');
-    btnIcon.style.display = 'none';
-    bars.style.display = 'flex';
-    resultCard.classList.remove('show');
-  }
+            } else {
+                // ===== Recording ROKEIN =====
+                mediaRecorder.stop();
+                isRecording = false;
+                recordBtn.textContent = "🎤 Start Recording";
+                recordBtn.classList.remove("recording");
+                statusDiv.textContent = "⏳ Song is Recognizing...";
+            }
+        });
 
-  function exitListeningUI(){
-    tapZone.classList.remove('listening');
-    btnIcon.style.display = 'block';
-    bars.style.display = 'none';
-    statusText.textContent = '\u00A0';
-    listening = false;
-  }
+        async function sendToBackend(audioBlob) {
+            const formData = new FormData();
+            formData.append("file", audioBlob, "clip.webm");
 
-  // ---- WAV encoding helpers ----
-  // The backend only accepts .wav, but MediaRecorder gives us webm/ogg.
-  // So we decode the recorded audio into raw PCM samples and build a
-  // standard WAV file ourselves, entirely in the browser.
-  function audioBufferToWavBlob(audioBuffer){
-    const numChannels = 1; // downmix to mono
-    const sampleRate = audioBuffer.sampleRate;
-    const chData = audioBuffer.numberOfChannels > 1
-      ? mixDownToMono(audioBuffer)
-      : audioBuffer.getChannelData(0);
+            try {
+                const response = await fetch(`${API_URL}/recognize`, {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await response.json();
 
-    const bytesPerSample = 2; // 16-bit PCM
-    const blockAlign = numChannels * bytesPerSample;
-    const dataSize = chData.length * bytesPerSample;
-    const buffer = new ArrayBuffer(44 + dataSize);
-    const view = new DataView(buffer);
-
-    function writeString(offset, str){
-      for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
-    }
-
-    writeString(0, 'RIFF');
-    view.setUint32(4, 36 + dataSize, true);
-    writeString(8, 'WAVE');
-    writeString(12, 'fmt ');
-    view.setUint32(16, 16, true);          // PCM chunk size
-    view.setUint16(20, 1, true);           // audio format = PCM
-    view.setUint16(22, numChannels, true);
-    view.setUint32(24, sampleRate, true);
-    view.setUint32(28, sampleRate * blockAlign, true);
-    view.setUint16(32, blockAlign, true);
-    view.setUint16(34, 16, true);          // bits per sample
-    writeString(36, 'data');
-    view.setUint32(40, dataSize, true);
-
-    let offset = 44;
-    for (let i = 0; i < chData.length; i++){
-      const s = Math.max(-1, Math.min(1, chData[i]));
-      view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
-      offset += 2;
-    }
-
-    return new Blob([buffer], { type: 'audio/wav' });
-  }
-
-  function mixDownToMono(audioBuffer){
-    const len = audioBuffer.length;
-    const out = new Float32Array(len);
-    for (let ch = 0; ch < audioBuffer.numberOfChannels; ch++){
-      const data = audioBuffer.getChannelData(ch);
-      for (let i = 0; i < len; i++) out[i] += data[i] / audioBuffer.numberOfChannels;
-    }
-    return out;
-  }
-
-  async function recordAudioAsWav(seconds){
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const recorder = new MediaRecorder(stream);
-    const chunks = [];
-
-    return new Promise((resolve, reject) => {
-      recorder.ondataavailable = (e) => chunks.push(e.data);
-      recorder.onerror = reject;
-      recorder.onstop = async () => {
-        stream.getTracks().forEach(t => t.stop());
-        try {
-          const webmBlob = new Blob(chunks, { type: recorder.mimeType });
-          const arrayBuf = await webmBlob.arrayBuffer();
-          const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-          const decoded = await audioCtx.decodeAudioData(arrayBuf);
-          resolve(audioBufferToWavBlob(decoded));
-        } catch (err) {
-          reject(err);
+                if (data.status === "found") {
+                    statusDiv.textContent = "✅ Match Found!";
+                    resultDiv.innerHTML = `
+                        <strong>${data.song.title}</strong><br>
+                        ${data.song.artist}<br>
+                        
+                    `;
+                } else {
+                    statusDiv.textContent = "❌ No Match Found";
+                    resultDiv.textContent = "This song is not in Database.";
+                }
+            } catch (err) {
+                statusDiv.textContent = "❌ Server not connected.";
+                resultDiv.textContent = err.message;
+            }
         }
-      };
-      recorder.start();
-      setTimeout(() => recorder.stop(), seconds * 1000);
-    });
-  }
+    </script>
 
-  async function recognize(wavBlob){
-    const backend = urlInput.value.trim().replace(/\/$/, '');
-    const formData = new FormData();
-    formData.append('file', wavBlob, 'clip.wav');
-
-    const res = await fetch(`${backend}/recognize`, {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (!res.ok) {
-      throw new Error(`Server error: ${res.status}`);
-    }
-    return res.json();
-  }
-
-  document.getElementById('shazamBtn').addEventListener('click', async () => {
-    if (listening) return;
-    listening = true;
-
-    enterListeningUI();
-    setHeadline('Listening...', 'Hold tight, analyzing the audio');
-    statusText.textContent = `Recording ${RECORD_SECONDS}s of audio`;
-
-    try {
-      const wavBlob = await recordAudioAsWav(RECORD_SECONDS);
-
-      statusText.textContent = 'Uploading & matching against database...';
-      const data = await recognize(wavBlob);
-
-      if (data.match) {
-        resTitle.textContent = data.song.title;
-        resArtist.textContent = data.song.artist;
-        setHeadline('Got it!', 'Tap the button to search again');
-        resultCard.classList.add('show');
-      } else {
-        setHeadline('No match found', 'Try again closer to the audio source');
-      }
-    } catch (err) {
-      console.error(err);
-      if (err.name === 'NotAllowedError') {
-        setHeadline('Mic permission needed', 'Please allow microphone access and try again');
-      } else {
-        setHeadline('Something went wrong', 'Check backend URL & that the server is running');
-      }
-    } finally {
-      exitListeningUI();
-    }
-  });
-</script>
 </body>
 </html>
