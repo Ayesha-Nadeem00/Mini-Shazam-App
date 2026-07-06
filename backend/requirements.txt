@@ -1,0 +1,10 @@
+numpy
+scipy
+librosa
+psycopg2-binarynumpy
+scipy
+librosa
+psycopg2-binary
+fastapi
+uvicorn
+python-multipart
