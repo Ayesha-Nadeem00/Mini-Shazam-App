@@ -8,24 +8,24 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
     :root {
-        --bg-deep: #eaf4ff;
-        --bg-mid: #ffffff;
-        --accent: #0a84ff;
-        --accent-glow: #4fa8ff;
-        --accent-soft: rgba(10, 132, 255, 0.15);
-        --text-primary: #0b1a33;
-        --text-secondary: #5c7092;
-        --danger: #ff5c72;
-        --success: #16a37e;
-        --card: #ffffff;
-        --border: #cfe2f7;
+        --bg-deep: #050d0c; /* Deep dark teal black */
+        --bg-mid: #0a1a19;  /* Deep dark teal */
+        --accent: #14b8a6;  /* Bright neon teal */
+        --accent-glow: #2dd4bf; /* Vibrant teal glow */
+        --accent-soft: rgba(20, 184, 166, 0.15);
+        --text-primary: #f1f5f9; /* Near-white primary text */
+        --text-secondary: #94a3b8; /* Soft blue-grey secondary text */
+        --danger: #f87171; /* High visibility warning red */
+        --success: #34d399; /* Vibrant mint success green */
+        --card: #112725; /* Elevated surface card color */
+        --border: #1e3d3a; /* Dark subtle borders */
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
         font-family: 'Inter', sans-serif;
-        background: radial-gradient(circle at 50% 0%, var(--bg-mid) 0%, var(--bg-deep) 60%);
+        background: radial-gradient(circle at 50% 0%, var(--bg-mid) 0%, var(--bg-deep) 100%);
         color: var(--text-primary);
         min-height: 100vh;
         display: flex;
@@ -39,6 +39,8 @@
         display: flex;
         flex-direction: column;
         position: relative;
+        background: rgba(5, 13, 12, 0.6);
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
     }
 
     header {
@@ -62,6 +64,7 @@
         font-size: 20px;
         font-weight: 700;
         letter-spacing: 2px;
+        color: var(--text-primary);
     }
 
     main {
@@ -86,6 +89,7 @@
         font-family: 'Space Grotesk', sans-serif;
         font-size: 26px;
         font-weight: 600;
+        color: var(--text-primary);
     }
 
     .search-view p {
@@ -130,7 +134,7 @@
         border: none;
         cursor: pointer;
         background: linear-gradient(145deg, var(--accent-glow), var(--accent) 70%);
-        box-shadow: 0 0 40px rgba(10, 132, 255, 0.35), inset 0 0 20px rgba(255,255,255,0.35);
+        box-shadow: 0 0 40px rgba(20, 184, 166, 0.35), inset 0 0 20px rgba(255,255,255,0.2);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -141,8 +145,8 @@
     #recordBtn:active { transform: scale(0.94); }
 
     #recordBtn.recording {
-        background: linear-gradient(145deg, #ff6f7f, var(--danger) 70%);
-        box-shadow: 0 0 40px rgba(255, 92, 114, 0.5), inset 0 0 20px rgba(255,255,255,0.15);
+        background: linear-gradient(145deg, #ff8a95, var(--danger) 70%);
+        box-shadow: 0 0 40px rgba(248, 113, 113, 0.5), inset 0 0 20px rgba(255,255,255,0.15);
     }
 
     #recordBtn svg { width: 44px; height: 44px; }
@@ -167,7 +171,7 @@
         align-items: center;
         gap: 14px;
         text-align: left;
-        box-shadow: 0 4px 20px rgba(10, 132, 255, 0.08);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     }
 
     .result-card.show { display: flex; }
@@ -176,24 +180,15 @@
         width: 54px;
         height: 54px;
         border-radius: 12px;
-        background: linear-gradient(135deg, var(--accent), #5cc8ff);
+        background: linear-gradient(135deg, var(--accent), #115e59);
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
         font-size: 22px;
-        overflow: hidden;
     }
 
-    .result-art img,
-    .song-icon img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        border-radius: inherit;
-    }
-
-    .result-info h3 { font-size: 16px; font-weight: 600; }
+    .result-info h3 { font-size: 16px; font-weight: 600; color: var(--text-primary); }
     .result-info p { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
     .result-info .score { font-size: 11px; color: var(--accent); margin-top: 4px; }
 
@@ -211,6 +206,7 @@
     .library-header h2 {
         font-family: 'Space Grotesk', sans-serif;
         font-size: 22px;
+        color: var(--text-primary);
     }
 
     .count-pill {
@@ -233,6 +229,12 @@
         font-size: 14px;
         font-weight: 500;
         cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    #addSongBtn:hover {
+        background: var(--accent-soft);
+        border-color: var(--accent);
     }
 
     .song-row {
@@ -256,7 +258,7 @@
     }
 
     .song-details { flex: 1; min-width: 0; }
-    .song-details .t { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .song-details .t { font-size: 14px; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .song-details .a { font-size: 12px; color: var(--text-secondary); }
 
     .delete-btn {
@@ -267,8 +269,9 @@
         cursor: pointer;
         padding: 6px 10px;
         border-radius: 8px;
+        transition: background 0.2s;
     }
-    .delete-btn:hover { background: rgba(255, 92, 114, 0.1); }
+    .delete-btn:hover { background: rgba(248, 113, 113, 0.15); }
 
     .empty-msg {
         text-align: center;
@@ -286,10 +289,11 @@
         width: 100%;
         max-width: 480px;
         display: flex;
-        background: rgba(255, 255, 255, 0.85);
+        background: rgba(10, 26, 25, 0.85);
         backdrop-filter: blur(12px);
         border-top: 1px solid var(--border);
         padding: 10px 0 18px;
+        z-index: 5;
     }
 
     .nav-btn {
@@ -304,16 +308,17 @@
         gap: 4px;
         cursor: pointer;
         font-family: 'Inter', sans-serif;
+        transition: color 0.2s;
     }
 
     .nav-btn.active { color: var(--accent); }
     .nav-btn svg { width: 20px; height: 20px; }
 
-    /* ---------- MODAL (Add song) ---------- */
     .modal-overlay {
         position: fixed;
         inset: 0;
-        background: rgba(10, 26, 51, 0.35);
+        background: rgba(5, 13, 12, 0.75);
+        backdrop-filter: blur(4px);
         display: none;
         align-items: flex-end;
         justify-content: center;
@@ -325,15 +330,19 @@
         width: 100%;
         max-width: 480px;
         background: var(--bg-mid);
-        border: 1px solid var(--border);
+        border-top: 1px solid var(--border);
+        border-left: 1px solid var(--border);
+        border-right: 1px solid var(--border);
         border-radius: 24px 24px 0 0;
-        padding: 24px;
+        padding: 24px 24px 36px;
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
     }
 
     .modal h3 {
         font-family: 'Space Grotesk', sans-serif;
         font-size: 18px;
         margin-bottom: 16px;
+        color: var(--text-primary);
     }
 
     .field { margin-bottom: 14px; }
@@ -351,6 +360,9 @@
         background: var(--card);
         color: var(--text-primary);
         font-size: 14px;
+    }
+    .field input[type="text"]::placeholder {
+        color: #4b5563;
     }
     .field input[type="file"] {
         width: 100%;
@@ -372,15 +384,22 @@
         font-size: 14px;
         font-weight: 600;
         cursor: pointer;
+        transition: opacity 0.2s;
     }
-    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary { background: var(--accent); color: var(--bg-deep); }
+    .btn-primary:hover { opacity: 0.9; }
     .btn-secondary { background: var(--card); color: var(--text-secondary); border: 1px solid var(--border); }
+    .btn-secondary:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
 
     .modal-status {
         margin-top: 10px;
         font-size: 13px;
         text-align: center;
         min-height: 18px;
+    }
+
+    .text-center {
+        text-align: center;
     }
 </style>
 </head>
@@ -415,7 +434,7 @@
             <div class="status-text" id="statusText">Ready</div>
 
             <div class="result-card" id="resultCard">
-                <div class="result-art" id="resultArt">🎵</div>
+                <div class="result-art">🎵</div>
                 <div class="result-info">
                     <h3 id="resultTitle"></h3>
                     <p id="resultArtist"></p>
@@ -469,15 +488,23 @@
                 <label>Audio file</label>
                 <input type="file" id="inputFile" accept="audio/*">
             </div>
-            <div class="field">
-                <label>Cover image (optional)</label>
-                <input type="file" id="inputImage" accept="image/*">
-            </div>
             <div class="modal-actions">
                 <button class="btn-secondary" id="cancelAdd">Cancel</button>
                 <button class="btn-primary" id="confirmAdd">Add song</button>
             </div>
             <div class="modal-status" id="modalStatus"></div>
+        </div>
+    </div>
+
+    <!-- ============ CUSTOM CONFIRMATION DIALOG ============ -->
+    <div class="modal-overlay" id="confirmOverlay">
+        <div class="modal text-center">
+            <h3 style="margin-bottom: 12px;">Delete Song?</h3>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px;">Are you sure you want to delete this song from your library?</p>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="confirmCancel">Cancel</button>
+                <button class="btn-primary" id="confirmDelete" style="background: var(--danger); color: white;">Delete</button>
+            </div>
         </div>
     </div>
 
@@ -510,14 +537,13 @@
     const searchTitle = document.getElementById("searchTitle");
     const searchSubtitle = document.getElementById("searchSubtitle");
     const resultCard = document.getElementById("resultCard");
-    const resultArt = document.getElementById("resultArt");
     const resultTitle = document.getElementById("resultTitle");
     const resultArtist = document.getElementById("resultArtist");
     const resultScore = document.getElementById("resultScore");
     const rings = [document.getElementById("ring1"), document.getElementById("ring2"), document.getElementById("ring3")];
 
     let mediaRecorder, audioChunks = [], isRecording = false, autoStopTimer = null;
-    const RECORD_SECONDS = 10; // yahan se recording ki lambai badal/ghata sakte hain
+    const RECORD_SECONDS = 10; // recording time duration
 
     function stopRecording() {
         if (!isRecording) return;
@@ -533,7 +559,6 @@
 
     recordBtn.addEventListener("click", async () => {
         if (isRecording) {
-            // Chahein to click karke jaldi bhi rok sakte hain
             stopRecording();
             return;
         }
@@ -556,7 +581,6 @@
             statusText.className = "status-text";
             resultCard.classList.remove("show");
 
-            // Khud hi ruk jayega RECORD_SECONDS baad, dobara click ki zaroorat nahi
             autoStopTimer = setTimeout(stopRecording, RECORD_SECONDS * 1000);
 
         } catch (err) {
@@ -579,12 +603,6 @@
                 statusText.className = "status-text success";
                 resultTitle.textContent = data.song.title;
                 resultArtist.textContent = data.song.artist;
-                //resultScore.textContent = `Confidence ${data.song.score}`;
-                if (data.song.image_url) {
-                    resultArt.innerHTML = `<img src="${data.song.image_url}" alt="cover">`;
-                } else {
-                    resultArt.innerHTML = "🎵";
-                }
                 resultCard.classList.add("show");
             } else {
                 searchTitle.textContent = "No match found";
@@ -621,7 +639,7 @@
 
             songList.innerHTML = songsRes.songs.map(s => `
                 <div class="song-row" data-id="${s.id}">
-                    <div class="song-icon">${s.image_url ? `<img src="${s.image_url}" alt="cover">` : "🎵"}</div>
+                    <div class="song-icon">🎵</div>
                     <div class="song-details">
                         <div class="t">${escapeHtml(s.title)}</div>
                         <div class="a">${escapeHtml(s.artist)}</div>
@@ -631,7 +649,7 @@
             `).join("");
 
             document.querySelectorAll(".delete-btn").forEach(btn => {
-                btn.addEventListener("click", () => deleteSong(btn.dataset.id));
+                btn.addEventListener("click", () => queueDeleteSong(btn.dataset.id));
             });
         } catch (err) {
             songList.innerHTML = `<div class="empty-msg">Could not reach server.</div>`;
@@ -644,11 +662,34 @@
         return div.innerHTML;
     }
 
-    async function deleteSong(id) {
-        if (!confirm("Delete this song from your library?")) return;
-        await fetch(`${API_URL}/songs/${id}`, { method: "DELETE" });
-        loadSongs();
+    // ---------- Safe Custom Confirmation logic (No window.confirm) ----------
+    let songIdToDelete = null;
+    const confirmOverlay = document.getElementById("confirmOverlay");
+    const confirmCancel = document.getElementById("confirmCancel");
+    const confirmDelete = document.getElementById("confirmDelete");
+
+    function queueDeleteSong(id) {
+        songIdToDelete = id;
+        confirmOverlay.classList.add("show");
     }
+
+    confirmCancel.addEventListener("click", () => {
+        songIdToDelete = null;
+        confirmOverlay.classList.remove("show");
+    });
+
+    confirmDelete.addEventListener("click", async () => {
+        if (songIdToDelete) {
+            try {
+                await fetch(`${API_URL}/songs/${songIdToDelete}`, { method: "DELETE" });
+                loadSongs();
+            } catch (err) {
+                console.error("Delete failed", err);
+            }
+        }
+        songIdToDelete = null;
+        confirmOverlay.classList.remove("show");
+    });
 
     // ---------- Add song modal ----------
     const modalOverlay = document.getElementById("modalOverlay");
@@ -665,7 +706,6 @@
         const artist = document.getElementById("inputArtist").value.trim();
         const album = document.getElementById("inputAlbum").value.trim();
         const file = document.getElementById("inputFile").files[0];
-        const imageFile = document.getElementById("inputImage").files[0];
 
         if (!title || !artist || !file) {
             modalStatus.textContent = "Please fill title, artist and choose a file.";
@@ -681,9 +721,6 @@
         formData.append("artist", artist);
         formData.append("album", album);
         formData.append("file", file);
-        if (imageFile) {
-            formData.append("image", imageFile);
-        }
 
         try {
             const res = await fetch(`${API_URL}/songs/add`, { method: "POST", body: formData });
@@ -699,7 +736,6 @@
                     document.getElementById("inputArtist").value = "";
                     document.getElementById("inputAlbum").value = "";
                     document.getElementById("inputFile").value = "";
-                    document.getElementById("inputImage").value = "";
                     loadSongs();
                 }, 900);
             } else {
